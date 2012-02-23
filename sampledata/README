@@ -1,0 +1,5 @@
+Sample data inbox and sent_items come from the publicly-available Enron email dataset (http://www.cs.cmu.edu/~enron/).  
+
+To import, run ./import_inbox.sh && ./import_sentmail.sh
+
+
