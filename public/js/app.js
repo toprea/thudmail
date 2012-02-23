@@ -36,7 +36,11 @@ var thud = {
     init: function() {
         this.router = new ThudRouter();
         Backbone.history.start();
-        this.router.navigate("INBOX", {trigger: true});
+
+        // don't blow away an existing hash -- a user might refresh a page
+        if (document.location.hash === "") {
+            this.router.navigate("INBOX", {trigger: true});
+        }
 
         $('#search').on('click', thud.eventHandlers.search);
    }, 
