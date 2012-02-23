@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>thudmail</title>
+</head>
+
+<body>
+  
+  <div id="page-container" style="width:1604px; border: thin dashed black; height: auto; overflow: auto;">
+    <div id="topbar" style="border: thin solid blue;">
+      <span>thudmail</span>
+      <input type="text" name="q" id="q"/>
+      <button id="search">search</button>
+    </div>    
+    <div>
+      <div id="sidebar" style="float:left; width: 200px; border: thin solid red;">
+        <div style="text-align: center; width: 100%; margin-top: 10px;">
+          <span><a>COMPOSE</a></span>
+        </div>
+        <ul>
+          <li><a href="#INBOX">INBOX</a></li>
+          <li><a href="#Sent Mail">Sent Mail</a></li>
+          <li>Drafts</li>
+        </ul>
+        <ul>
+          <li>Label 1</li>
+          <li>Label 2</li>
+        </ul>
+      </div>
+      <div id="main-container" style="float: left; width: 1400px; border: thin solid green;">
+          <div id="main" style="width: 100%;"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- templates -->
+  <div id='templates' style="display:none;">
+
+    <script name="message-list" type="text/html">
+      <div>
+        <span>Count: <%= count %></span>
+        <span>Page: <%= page %></span>
+        <span>Page Size: <%= per_page %></span>
+        <span>Total: <%= total %></span>
+      </div>
+      <table>
+        <tr>
+          <% if (typeof isSentMail !== 'undefined') { %>
+            <th>To</th>
+          <% } else { %> 
+            <th>From</th>
+          <% } %>
+          
+          <th>Subject</th>
+          <th>Date</th>
+        </tr>
+        <% _.each(messages, function(m) { %>
+        <tr class="message" data-message-id="<%= m.id %>" >
+                  <% if (typeof isSentMail !== 'undefined') { %>
+                    <td class="to"><%= m.to %></td>
+                  <% } else { %> 
+                    <td class="from"><%= m.from %></td>
+                  <% } %>
+
+                  <td class="subject"><a href="#message/<%= m.id %>"><%= m.subject %></a></td>
+                  <td class="date"><%= m.date %></td>
+        </tr>
+        <% }); %>
+      </table>
+    </script>
+
+    <script name="message-details" type="text/html">
+      <div class="message-header">
+        <div><span class="header-name">From:</span><span class="header-value"><%= from %></span></div>
+        <div><span class="header-name">To:</span><span class="header-value"><%= to %></span></div>
+        <div><span class="header-name">Date:</span><span class="header-value"><%= date %></span></div>
+        <div><span class="header-name">Subject:</span><span class="header-value"><%= subject %></span></div>
+      </div>
+      <div class="message-body">
+        <%= (body + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br/>$2')  %>
+      </div>
+    </script>
+  </div>
+
+  <!-- libraries -->
+  <script src="/js/lib/jquery.js"></script>
+  <script src="/js/lib/underscore.js"></script>
+  <script src="/js/lib/backbone.js"></script>
+  
+  <!-- app code -->
+  <script src="/js/app.js"></script>
+  
+
+
+</body>
+</html>
