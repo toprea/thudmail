@@ -36,7 +36,7 @@ var thud = {
   init: function() {
 
     $.ajaxSetup({
-      headers: {'X-Thudmail-Authtoken': 'user1'}
+      headers: {'X-Thudmail-Authtoken': 'user2'}
     });
 
     this.initTemplates();

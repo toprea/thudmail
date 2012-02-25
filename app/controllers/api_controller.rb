@@ -7,7 +7,7 @@ class ApiController < ApplicationController
         if token
             user = User.validate_authtoken(token)
             if user
-                @current_user = true
+                @current_user = user
                 return
             end
         end
