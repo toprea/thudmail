@@ -26,6 +26,14 @@ class ApiController < ApplicationController
         json response
     end
 
+    def labels
+        system_labels = Label.where(:system => true)
+        user_labels = Label.where(:system => false)
+        response = {:systemLabels => system_labels.map{|l| l.name},
+            :userLabels => user_labels.map{|l| l.name} }
+        json response
+    end
+
 
     def label
         label = Label.where(:name => params[:name]).first

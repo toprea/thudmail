@@ -13,41 +13,41 @@
 ActiveRecord::Schema.define(:version => 5) do
 
   create_table "accounts", :force => true do |t|
-    t.integer  "user_id"
-    t.string   "name"
+    t.integer  "user_id",    :null => false
+    t.string   "name",       :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
 
   create_table "labels", :force => true do |t|
     t.integer "user_id"
-    t.string  "name"
-    t.boolean "system"
+    t.string  "name",    :null => false
+    t.boolean "system",  :null => false
   end
 
   create_table "labels_messages", :force => true do |t|
-    t.integer "message_id"
-    t.integer "label_id"
+    t.integer "message_id", :null => false
+    t.integer "label_id",   :null => false
   end
 
   create_table "messages", :force => true do |t|
-    t.integer  "user_id"
-    t.integer  "account_id"
+    t.integer  "user_id",                           :null => false
+    t.integer  "account_id",                        :null => false
     t.datetime "header_date"
     t.string   "header_message_id"
     t.string   "header_from"
     t.string   "header_to",         :limit => 1000
     t.string   "header_subject"
-    t.boolean  "read"
-    t.boolean  "has_attachments"
+    t.boolean  "read",                              :null => false
+    t.boolean  "has_attachments",                   :null => false
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
   end
 
   create_table "users", :force => true do |t|
     t.string   "email"
-    t.string   "username"
-    t.string   "password_digest"
+    t.string   "username",        :null => false
+    t.string   "password_digest", :null => false
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
   end

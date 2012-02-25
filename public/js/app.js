@@ -34,31 +34,44 @@ var thud = {
 
   router: {},
   init: function() {
-    this.router = new ThudRouter();
-    Backbone.history.start();
-
-    // don't blow away an existing hash -- a user might refresh a page
-    if (document.location.hash === "") {
-      this.router.navigate("INBOX", {trigger: true});
-    }
 
     this.initTemplates();
 
+    this.router = new ThudRouter();
+    Backbone.history.start();
+
+    // load labels
+    this.showLabelList();
+
+    // don't blow away an existing hash -- a user might refresh a page
+    if (document.location.hash === "") {
+      this.router.navigate("INBOX/p1", {trigger: true});
+    }
+
     $('#search').on('click', thud.eventHandlers.search);
   }, 
+
+  showLabelList: function() {
+    $.ajax({
+      url: '/api/labels',
+      success: function(response) {
+        console.log('showLabelList: got response');
+        var el = $('#label-list');
+        el.html(thud.renderTemplate('label-list', response));
+      }
+    });
+  },
 
   showSearchResults: function(query, page) {
     query = typeof query !== 'undefined' ? query : '';
     page = typeof page !== 'undefined' ? page : '1';
     console.log('showSearchResults ' + query);
-    var template = this.getTemplate('message-list');
     $.ajax({
       url: '/api/search?q=' + query + '&page=' + page,
       success: function(response) {
         console.log('showSeachResults: got response');
         var el = $('#main');
         el.html(thud.renderTemplate('message-list', response));
-        //el.on('click', thud.eventHandlers.messagelist);
       }
     });
   },
@@ -69,7 +82,6 @@ var thud = {
 
     console.log('showMailbox ' + label);
 
-    var template = this.getTemplate('message-list');
     $.ajax({
       url: '/api/label/' + label+ '?page=' + page,
       success: function(response) {
@@ -79,7 +91,6 @@ var thud = {
           response.isSentMail = true;
         }
         el.html(thud.renderTemplate('message-list', response));
-        //el.on('click', thud.eventHandlers.messagelist);
       }
     });
   },
@@ -119,7 +130,7 @@ var thud = {
            
     search: function(e) {
       var query = $('#q').val();
-      thud.router.navigate('search/' + query, {trigger: true});
+      thud.router.navigate('search/' + query + '/p1', {trigger: true});
     }
   }
 }

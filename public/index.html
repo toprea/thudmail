@@ -20,15 +20,8 @@
         <div style="text-align: center; width: 100%; margin-top: 10px;">
           <span><a>COMPOSE</a></span>
         </div>
-        <ul>
-          <li><a href="#INBOX">INBOX</a></li>
-          <li><a href="#Sent Mail">Sent Mail</a></li>
-          <li>Drafts</li>
-        </ul>
-        <ul>
-          <li>Label 1</li>
-          <li>Label 2</li>
-        </ul>
+        <div id="label-list">
+        </div>
       </div>
       <div id="main-container" style="float: left; width: 1400px; border: thin solid green;">
           <div id="main" style="width: 100%;"></div>
@@ -39,6 +32,19 @@
 
   <!-- templates -->
   <div id='templates' style="display:none;">
+
+    <script name="label-list" type="text/html">
+      <ul>
+        {{#each systemLabels}}
+          <li><a href="#{{this}}/p1">{{this}}</a></li>
+        {{/each}}
+      </ul>
+      <ul>
+        {{#each userLabels}}
+          <li><a href="#{{this}}/p1">{{this}}</a></li>
+        {{/each}}
+      </ul>
+    </script>
 
     <script name="message-list" type="text/html">
       <div>
@@ -60,10 +66,10 @@
         </tr>
         {{#each messages}}
           <tr class="message" data-message-id="{{id}}" >
-            {{#if isSentMail}}
-              <td class="to">{{m.to}}</td>
+            {{#if ../isSentMail}}
+              <td class="to">{{to}}</td>
             {{else}}
-              <td class="from">{{m.from}}</td>
+              <td class="from">{{from}}</td>
             {{/if}}
 
             <td class="subject"><a href="#message/{{id}}">{{subject}}</a></td>
@@ -80,6 +86,7 @@
         <div><span class="header-name">Date:</span><span class="header-value">{{date}}</span></div>
         <div><span class="header-name">Subject:</span><span class="header-value">{{subject}}</span></div>
       </div>
+      <hr/>
       <div class="message-body">
         {{{nl2br body}}}
       </div>

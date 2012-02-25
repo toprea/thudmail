@@ -1,3 +1,4 @@
+require 'search_index'
 class User < ActiveRecord::Base
 	has_secure_password
 
@@ -10,29 +11,26 @@ class User < ActiveRecord::Base
 		User.find_by_username(username).try(:authenticate, password)
 	end
 	
+	def self.add(username, password)
+		user = User.create(:username => username, :password => password)
+		account = Account.create(:user => user, :name => 'default')
+		label = Label.create(:user => user, :name => 'INBOX', :system => true)
+		label = Label.create(:user => user, :name => 'Sent Mail', :system => true)
+		label = Label.create(:user => user, :name => 'Drafts', :system => true)
+		return user
+	end
 
 	# returns the Ferret index for the current user.
 	# if index does not exist, creates it.
 	def index
-		if @index 
-			return @index
+		if not @index 
+			@index = SearchIndex.new(self)
 		end
-		index_dir = self.index_dir
-		unless File.exists?(index_dir) 
-			Dir.mkdir(index_dir)
-		end
-		@index = Ferret::I.new(:path => index_dir)
 		return @index
+		
 	end
 
-	#don't actually know how to do this yet
-	def rebuild_index
-		return false
-	end
-
-	def index_dir
-		"#{Rails.root}/indexes/#{username}"
-	end
+	
 
 	
 end

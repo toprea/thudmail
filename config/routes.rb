@@ -17,7 +17,7 @@ Thudmail::Application.routes.draw do
   match '/api/message/:id/mark_unread' => 'api#mark_undread', :via => :post
   match '/api/message/:id/delete' => 'api#delete', :via => :delete
   match '/api/message/:id/attachment/:index' => 'api#attachment', :via => :get
-  #match '/api/label/list' => 'api#labels'
+  match '/api/labels' => 'api#labels'
   match '/api/label/:name' => 'api#label', :via => :get
   match '/api/search' => 'api#search', :via => :get
   

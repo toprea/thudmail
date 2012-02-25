@@ -7,7 +7,7 @@
 #   Mayor.create(:name => 'Emanuel', :city => cities.first)
 
 
-user = User.create(:username => 'test', :password => 'test')
-account = Account.create(:user => user, :name => 'default')
-label = Label.create(:user => user, :name => 'INBOX', :system => true)
-label = Label.create(:user => user, :name => 'Sent Mail', :system => true)
+#user = User.create(:username => 'test', :password => 'test')
+#account = Account.create(:user => user, :name => 'default')
+#label = Label.create(:user => user, :name => 'INBOX', :system => true)
+#label = Label.create(:user => user, :name => 'Sent Mail', :system => true)
