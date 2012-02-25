@@ -15,6 +15,6 @@ It consists of:
 ##Installing
 
 * You'll need Rails 3.2.1.  Untested with any other versions.
-* Grab the source and run 'rake db:create' / db:migrate / db:seed to bring up the database.
-* Run sampledata/import_inbox.sh and sampledata/import_sentmail.sh to import some sample emails.
+* Grab the source and run 'rake db:create db:migrate' to bring up the database.
+* Run sampledata/import.sh to import some sample users and emails.
 * Run 'rails server' to start, and hit http://localhost:3000
