@@ -16,5 +16,5 @@ It consists of:
 
 * You'll need Rails 3.2.1.  Untested with any other versions.
 * Grab the source and run 'rake db:create db:migrate' to bring up the database.
-* Run sampledata/import.sh to import some sample users and emails.
+* Go into the sampledata directory and run ./import.sh to import some sample users and emails.
 * Run 'rails server' to start, and hit http://localhost:3000
