@@ -35,6 +35,10 @@ var thud = {
   router: {},
   init: function() {
 
+    $.ajaxSetup({
+      headers: {'X-Thudmail-Authtoken': 'user1'}
+    });
+
     this.initTemplates();
 
     this.router = new ThudRouter();

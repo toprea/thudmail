@@ -10,7 +10,8 @@ Thudmail::Application.routes.draw do
   #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
   # This route can be invoked with purchase_url(:id => product.id)
 
-  # for testing
+
+  match '/api/login/:username/:password' => 'api#login', :via => :get
   match '/api/message/:id' => 'api#info', :via => :get
   match '/api/message/:id/details' => 'api#details', :via => :get
   match '/api/message/:id/mark_read' => 'api#mark_read', :via => :post

@@ -30,7 +30,13 @@ class User < ActiveRecord::Base
 		
 	end
 
-	
+	def generate_authtoken
+		return self.username
+	end
+
+	def self.validate_authtoken(token)
+		User.find_by_username(token)
+	end
 
 	
 end
