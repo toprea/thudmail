@@ -14,6 +14,7 @@ class Message < ActiveRecord::Base
 		{
 			:id => self.id,
 			:message_id => self.header_message_id,
+			:thread_id => self.thread_id,
 			:date => self.header_date,
 			:from => self.header_from,
 			:to => self.header_to,
@@ -57,7 +58,10 @@ class Message < ActiveRecord::Base
 
 	# Call Message.add to store a new message for a user and have it indexed
 	def self.add(raw_message, user, account, label)
-		#TODO sanity checks: label is user's, etc
+		
+		if account.user.id != user.id or label.user.id != user.id
+			raise "account or label do not belong to user"
+		end
 
 		message = Message.new
 		message.user = user
@@ -65,14 +69,17 @@ class Message < ActiveRecord::Base
 		message.read = false
 		
 		mail = Mail.new(raw_message)
-		message.header_message_id = mail.message_id
-		message.header_date = mail.date
+
+		# initial thread id is set to our own message id.  
+		# might be replaced by thread!, later
+		message.header_message_id = message.thread_id = mail.message_id
 		
+		message.header_date = mail.date
 		message.header_subject = mail.subject
 		
-		# to / from fields are handled weird.
+		# to / from fields are handled weirdly by the mail gem.
 		# mail.to / mail.from return either a string which is the bare email address (no display name)
-		# or an array of such strings.  If we want the display name, we have to treat mail as a hash
+		# or an array of such strings.  If we want the display name, we have to treat the mail object as a hash
 		# and look at the :to and :from keys, both of which return Mail::Field objects.  Calling .to_s on
 		# those objects will return all addresses joined together, with their display names.
 		message.header_to = mail[:to].to_s
@@ -80,10 +87,11 @@ class Message < ActiveRecord::Base
 		
 		message.has_attachments = (mail.attachments and mail.attachments.length > 0)
 		
-		# transactional: storing the message data requires a saved message.
-		# if something goes wrong storing it, delete the message as it is not valid
+		# save message so we can create its label association.
 		message.save
 		message.labels << label
+
+		# if we can't store the raw message, the db entry is useless, so delete it
 		begin
 			FSMessageStore.put(message, raw_message)
 		rescue => err
@@ -91,7 +99,81 @@ class Message < ActiveRecord::Base
 			raise err
 		end
 
+		begin
+			message.thread!
+		rescue 
+		end
+
 		user.index.add(message)
+	end
+
+	def thread!
+		# jwz's threading algorithm is all well and good, but we have our stuff in a database
+		# and we're lazy and don't care about hierarchy, just finding all messages in a thread. 
+		#
+		# scan the db for messages mentioned in References
+		# if one of those belongs to a non-singleton thread then so do we
+		# if not, try to find the last (most-recent) referenced message and add ourselves to its thread
+		# if that doesn't work either, do the same for In-Reply-To
+		# finally, strip all "Re:" prefixes and try to find the first matching subject line
+		# otherwise, we remain a singleton thread ourselves
+
+		# don't even bother unless subject starts with "Re:"
+		return unless self.header_subject and self.header_subject.strip.downcase.start_with?('re:')
+		
+		mail = Mail.new(self.raw_message)
+		return unless mail.references
+
+		references = mail.references # array of Message-ID -spec strings
+		in_reply_to = mail.in_reply_to
+
+		found_thread = false
+		
+		if references and references.length > 0
+		
+			referenced_msgs = Message.where(:user_id => self.user.id, :header_message_id => references)
+			referenced_msgs.each do |rm|
+				if rm.header_message_id != rm.thread_id
+					found_thread = true
+					self.thread_id = rm.thread_id
+					break
+				end
+			end
+
+			if not found_thread
+				last_referenced_msg = Message.where(:user_id => self.user.id, :header_message_id => references.last).last
+				if last_referenced_msg
+					found_thread = true
+					self.thread_id = last_referenced_msg.thread_id
+				end
+			end
+
+		end
+		
+		if (not found_thread) and in_reply_to 
+			in_reply_to_msg = Message.where(:user_id => self.user.id, :header_message_id => in_reply_to).first
+			if in_reply_to_msg
+				found_thread = true
+				self.thread_id = in_reply_to_msg.thread_id
+			end
+		end
+
+		if (not found_thread)
+			subject = self.header_subject.strip.downcase
+			while (subject.start_with?('re:'))
+				subject = subject[3,subject.length].strip
+			end
+			subject_msgs = Message.where(:user_id => self.user.id, :header_subject => subject)
+			if subject_msgs.length > 0
+				found_thread = true
+				self.thread_id = subject_msgs.first.thread_id
+			end
+		end
+
+		if found_thread
+			self.save
+		end
+
 	end
 
 	def body
@@ -115,6 +197,7 @@ class Message < ActiveRecord::Base
 	def index_entry
 		return { :id => self.id, 
 			:message_id => self.header_message_id,
+			:thread_id => self.thread_id,
 			:account => self.account.name,
 			:labels => self.labels.map {|l| l.name},
 			:subject => self.header_subject,

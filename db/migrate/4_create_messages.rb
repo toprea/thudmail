@@ -8,6 +8,8 @@ class CreateMessages < ActiveRecord::Migration
     	t.datetime :header_date
         
         t.string :header_message_id
+        t.string :thread_id
+
     	t.string :header_from
         t.string :header_to, :limit => 1000
     	t.string :header_subject

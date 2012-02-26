@@ -2,6 +2,12 @@ class ApiController < ApplicationController
 
     before_filter :validate_authtoken, :except => [:login]
 
+    # pushState doesn't seem to work so well, but if we were to do it,
+    # this action renders public.html
+    #def client
+    #    render :file => File.join(Rails.root, "public", "index.html"), :layout => false
+    #end
+
     def validate_authtoken
         token = request.env['HTTP_X_THUDMAIL_AUTHTOKEN']
         if token
