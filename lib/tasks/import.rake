@@ -96,15 +96,21 @@ namespace :import do
 
 				puts "importing into user #{user.username}, label #{label.name}"
 
+				i = 0
 				Dir.foreach(File.join(rootdir, userdir, labeldir)) do |email|
 					next if email.start_with?(".") or File.directory?(File.join(rootdir, userdir, labeldir, email))
 					#puts "email: #{email}"
-
+					i+=1
+					puts "importing email # #{i} [#{email}]"
 					str = IO.read(File.join(rootdir, userdir, labeldir, email))
-					Message.add(str, user, account, label)
+					Message.add(str, user, account, label, false, false) #add but don't thread or index
 				end #email
 
 			end #label
+			puts "rethreading..."
+			user.rethread_messages!
+			puts "reindexing..."
+			user.index.reindex!
 		end #user
 
 	end

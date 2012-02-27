@@ -20,6 +20,10 @@ class User < ActiveRecord::Base
 		return user
 	end
 
+	def rethread_messages!
+		Message.where(:user_id => self.id).order('header_date ASC').find_each{|m| m.thread!}
+	end
+
 	# returns the Ferret index for the current user.
 	# if index does not exist, creates it.
 	def index

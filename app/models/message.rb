@@ -57,7 +57,7 @@ class Message < ActiveRecord::Base
 	end
 
 	# Call Message.add to store a new message for a user and have it indexed
-	def self.add(raw_message, user, account, label)
+	def self.add(raw_message, user, account, label, do_threading = true, do_indexing = true)
 		
 		if account.user.id != user.id or label.user.id != user.id
 			raise "account or label do not belong to user"
@@ -99,12 +99,17 @@ class Message < ActiveRecord::Base
 			raise err
 		end
 
-		begin
-			message.thread!
-		rescue 
+		if do_threading
+			begin
+				message.thread!
+			rescue 
+			end
 		end
 
-		user.index.add(message)
+		if do_indexing
+			# fuck that's slow
+			user.index.add(message)
+		end
 	end
 
 	def thread!
