@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 5) do
+ActiveRecord::Schema.define(:version => 6) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "user_id",    :null => false
@@ -30,6 +30,10 @@ ActiveRecord::Schema.define(:version => 5) do
     t.integer "label_id",   :null => false
   end
 
+  add_index "labels_messages", ["label_id", "message_id"], :name => "index_labels_messages_on_label_id_and_message_id"
+  add_index "labels_messages", ["label_id"], :name => "index_labels_messages_on_label_id"
+  add_index "labels_messages", ["message_id"], :name => "index_labels_messages_on_message_id"
+
   create_table "messages", :force => true do |t|
     t.integer  "user_id",                           :null => false
     t.integer  "account_id",                        :null => false
@@ -44,6 +48,12 @@ ActiveRecord::Schema.define(:version => 5) do
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
   end
+
+  add_index "messages", ["header_date"], :name => "index_messages_on_header_date"
+  add_index "messages", ["header_message_id"], :name => "index_messages_on_header_message_id"
+  add_index "messages", ["header_subject"], :name => "index_messages_on_header_subject"
+  add_index "messages", ["id"], :name => "index_messages_on_id"
+  add_index "messages", ["thread_id"], :name => "index_messages_on_thread_id"
 
   create_table "users", :force => true do |t|
     t.string   "email"

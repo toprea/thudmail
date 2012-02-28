@@ -44,6 +44,7 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.17.2)
     multi_json (1.0.4)
+    mysql (2.8.1)
     polyglot (0.3.3)
     rack (1.4.1)
     rack-cache (1.1)
@@ -91,6 +92,7 @@ DEPENDENCIES
   bcrypt-ruby (~> 3.0.0)
   ferret
   json
+  mysql
   rails (= 3.2.1)
   rmail
   sqlite3

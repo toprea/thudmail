@@ -36,12 +36,12 @@
     <script name="label-list" type="text/html">
       <ul>
         {{#each systemLabels}}
-          <li><a href="/{{this}}/p1">{{this}}</a></li>
+          <li><a href="#{{this}}/p1">{{this}}</a></li>
         {{/each}}
       </ul>
       <ul>
         {{#each userLabels}}
-          <li><a href="/{{this}}/p1">{{this}}</a></li>
+          <li><a href="#{{this}}/p1">{{this}}</a></li>
         {{/each}}
       </ul>
     </script>
@@ -72,7 +72,7 @@
               <td class="from">{{from}}</td>
             {{/if}}
 
-            <td class="subject"><a href="/message/{{id}}">{{subject}}</a></td>
+            <td class="subject"><a href="#message/{{id}}">{{subject}}</a></td>
             <td class="date">{{date}}</td>
           </tr>
         {{/each}}

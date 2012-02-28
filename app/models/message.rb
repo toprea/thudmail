@@ -10,6 +10,12 @@ class Message < ActiveRecord::Base
 
 	has_and_belongs_to_many :labels
 
+
+	def self.test_threaded_label_page(label)
+	  thread_ids = Message.select(:thread_id).uniq.joins('INNER JOIN labels_messages lm ON lm.message_id = message_id').where('lm.label_id = ?', label.id).order('header_date DESC').limit(50).map{|m| m.thread_id}
+	  threads = Message.where(:thread_id => thread_ids)
+	end		
+
 	def data_info
 		{
 			:id => self.id,
@@ -114,7 +120,7 @@ class Message < ActiveRecord::Base
 
 	def thread!
 		# jwz's threading algorithm is all well and good, but we have our stuff in a database
-		# and we're lazy and don't care about hierarchy, just finding all messages in a thread. 
+		# and we're lazy and don't care about hierarchy, just a linear conversation view.
 		#
 		# scan the db for messages mentioned in References
 		# if one of those belongs to a non-singleton thread then so do we
@@ -129,12 +135,12 @@ class Message < ActiveRecord::Base
 		mail = Mail.new(self.raw_message)
 		return unless mail.references
 
-		references = mail.references # array of Message-ID -spec strings
-		in_reply_to = mail.in_reply_to
+		in_reply_to = mail.in_reply_to || ""
+		references = mail.references || [] # array of Message-ID -spec strings
 
 		found_thread = false
 		
-		if references and references.length > 0
+		if references.length > 0
 		
 			referenced_msgs = Message.where(:user_id => self.user.id, :header_message_id => references)
 			referenced_msgs.each do |rm|
@@ -155,7 +161,7 @@ class Message < ActiveRecord::Base
 
 		end
 		
-		if (not found_thread) and in_reply_to 
+		if (not found_thread) and in_reply_to != ""
 			in_reply_to_msg = Message.where(:user_id => self.user.id, :header_message_id => in_reply_to).first
 			if in_reply_to_msg
 				found_thread = true
@@ -168,6 +174,7 @@ class Message < ActiveRecord::Base
 			while (subject.start_with?('re:'))
 				subject = subject[3,subject.length].strip
 			end
+			# TODO should use search index instead
 			subject_msgs = Message.where(:user_id => self.user.id, :header_subject => subject)
 			if subject_msgs.length > 0
 				found_thread = true

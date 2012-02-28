@@ -15,6 +15,8 @@ gem 'ferret'
 
 gem 'will_paginate'
 
+gem 'mysql'
+
 # To use ActiveModel has_secure_password
 gem 'bcrypt-ruby', '~> 3.0.0'
 

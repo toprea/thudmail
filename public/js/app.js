@@ -36,7 +36,7 @@ var thud = {
   init: function() {
 
     $.ajaxSetup({
-      headers: {'X-Thudmail-Authtoken': 'user2'}
+      headers: {'X-Thudmail-Authtoken': 'user1'}
     });
 
     this.initTemplates();
@@ -87,7 +87,7 @@ var thud = {
     console.log('showMailbox ' + label);
 
     $.ajax({
-      url: '/api/label/' + label+ '?page=' + page,
+      url: '/api/labels/' + label+ '?page=' + page,
       success: function(response) {
         console.log('showMailbox: got response');
         var el = $('#main');
@@ -101,7 +101,7 @@ var thud = {
 
   showMessage: function(id) {
     console.log("readMessage: " + id);
-    $.ajax({ url: '/api/message/' + id + '/details',
+    $.ajax({ url: '/api/messages/' + id + '/details',
       success: function(response) {
         console.log('showMessage: got response');
         var el = $('#main');
