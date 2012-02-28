@@ -5,6 +5,7 @@ $(document).ready(function () {
 
 var ThudRouter = Backbone.Router.extend({
   routes: {
+    "login": "login",
     "search/:query": "search",
     "search/:query/p:page": "search",
     "message/:id": "message",
@@ -12,6 +13,11 @@ var ThudRouter = Backbone.Router.extend({
     ":label": "label",
     ":label/p:page": "label"
 
+  },
+
+  login: function() {
+    console.log("route: login");
+    thud.showLogin();
   },
 
   label: function(label, page) {
@@ -35,25 +41,41 @@ var thud = {
   router: {},
   init: function() {
 
-    $.ajaxSetup({
-      headers: {'X-Thudmail-Authtoken': 'tudor'}
-    });
-
     this.initTemplates();
 
-    this.router = new ThudRouter();
-    Backbone.history.start();
+    // if no auth token present, show login screen, otherwise load inbox
+    if (localStorage['authToken']) {
 
-    // load labels
-    this.showLabelList();
+      thud.setAuthToken(localStorage['authToken']);
+      // don't blow away an existing hash -- a user might refresh a page
 
-    // don't blow away an existing hash -- a user might refresh a page
-    if (document.location.hash === "") {
-      this.router.navigate("INBOX/p1", {trigger: true});
+      this.router = new ThudRouter();
+      Backbone.history.start();
+      if (document.location.hash === "") {
+        this.router.navigate("INBOX/p1", {trigger: true});
+      }
+
+    } else {
+      this.router = new ThudRouter();
+      Backbone.history.start();
+      this.router.navigate("login", {trigger: true});
     }
 
-    $('#search').on('click', thud.eventHandlers.search);
   }, 
+
+  showStandardLayout: function() {
+    var mainPage = $('#page-container');
+    mainPage.html(thud.getTemplateSource('standard-layout'));
+    $('#search').on('click', thud.eventHandlers.search);
+    thud.showLabelList();
+  },
+
+  showLogin: function() {
+    console.log("showLogin");
+    var mainPage = $('#page-container');
+    mainPage.html(thud.getTemplateSource('login-form'));
+    $('#btn-login').on('click', thud.eventHandlers.login)
+  },
 
   showLabelList: function() {
     $.ajax({
@@ -81,6 +103,7 @@ var thud = {
   },
 
   showMailbox: function(label, page) {
+    thud.showStandardLayout();
     label = typeof label !== 'undefined' ? label : 'INBOX';
     page = typeof page !== 'undefined' ? page : '1';
 
@@ -129,12 +152,25 @@ var thud = {
   getTemplate: function(name) {
     if (!thud.templates[name]) {
       //thud.templates[name] = _.template($('#templates > [name=' + name + ']').text());
-      thud.templates[name] = Handlebars.compile($('#templates > [name=' + name + ']').html());
+      thud.templates[name] = Handlebars.compile(thud.getTemplateSource(name));
     }
     return thud.templates[name];
   },
+
+  getTemplateSource: function(name) {
+    return $('#templates > [name=' + name + ']').html()
+  },
+
   renderTemplate: function(templateName, data) {
     return thud.getTemplate(templateName)(data);
+  },
+
+  setAuthToken: function(token) {
+    console.log('setAuthToken: ' + token)
+    localStorage.authToken = token;
+    $.ajaxSetup({
+      headers: {'X-Thudmail-Authtoken': token}
+    });
   },
           
   eventHandlers: {
@@ -142,6 +178,26 @@ var thud = {
     search: function(e) {
       var query = $('#q').val();
       thud.router.navigate('search/' + query + '/p1', {trigger: true});
+    }, 
+
+    login: function(e) {
+      var username = $('#tb-username').val();
+      var password = $('#tb-password').val();
+      $.ajax({
+        url: "/api/login",
+        type: "POST",
+        data: {username: username, password: password},
+        success: function(response) {
+          console.log("response from login: " + JSON.stringify(response));
+          if (response['status'] === 'success') {
+            thud.setAuthToken(response['authtoken']);
+            thud.router.navigate("INBOX/p1", {trigger: true});
+
+          } else {
+            alert("invalid login.");
+          }
+        }
+      });
     }
   }
 }

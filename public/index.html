@@ -8,30 +8,41 @@
 </head>
 
 <body>
-  
   <div id="page-container" style="width:1604px; border: thin dashed black; height: auto; overflow: auto;">
-    <div id="topbar" style="border: thin solid blue;">
-      <span>thudmail</span>
-      <input type="text" name="q" id="q"/>
-      <button id="search">search</button>
-    </div>    
-    <div>
-      <div id="sidebar" style="float:left; width: 200px; border: thin solid red;">
-        <div style="text-align: center; width: 100%; margin-top: 10px;">
-          <span><a>COMPOSE</a></span>
-        </div>
-        <div id="label-list">
-        </div>
-      </div>
-      <div id="main-container" style="float: left; width: 1400px; border: thin solid green;">
-          <div id="main" style="width: 100%;"></div>
-      </div>
-    </div>
+    
   </div>
 
 
   <!-- templates -->
   <div id='templates' style="display:none;">
+
+    <script name="login-form" type="text/html">
+      <div>
+        <div><label for="username">Username</label><input type="text" name="username" id="tb-username"></div>
+        <div><label for="password">Password</label><input type="password" name="password" id="tb-password"></div>
+        <div><button id="btn-login">login</button></div>
+      </div>
+    </script>
+
+    <script name="standard-layout" type="text/html">
+      <div id="topbar" style="border: thin solid blue;">
+        <span>thudmail</span>
+        <input type="text" name="q" id="q"/>
+        <button id="search">search</button>
+      </div>    
+      <div>
+        <div id="sidebar" style="float:left; width: 200px; border: thin solid red;">
+          <div style="text-align: center; width: 100%; margin-top: 10px;">
+            <span><a>COMPOSE</a></span>
+          </div>
+          <div id="label-list">
+          </div>
+        </div>
+        <div id="main-container" style="float: left; width: 1400px; border: thin solid green;">
+            <div id="main" style="width: 100%;"></div>
+        </div>
+      </div>
+    </script>
 
     <script name="label-list" type="text/html">
       <ul>
