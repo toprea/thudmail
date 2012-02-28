@@ -62,6 +62,7 @@
           {{/if}}
           
           <th>Subject</th>
+          <th>Flags</th>
           <th>Date</th>
         </tr>
         {{#each messages}}
@@ -72,8 +73,9 @@
               <td class="from">{{from}}</td>
             {{/if}}
 
-            <td class="subject"><a href="#message/{{id}}">{{subject}}</a></td>
-            <td class="date">{{date}}</td>
+            <td class="subject"><a href="#message/{{id}}">{{pick subject "(no subject)"}}</a></td>
+            <td class="attachment">{{#if has_attachments }} A {{else}} {{/if}}</td>
+            <td class="date">{{formatDate date}}</td>
           </tr>
         {{/each}}
       </table>
@@ -83,13 +85,23 @@
       <div class="message-header">
         <div><span class="header-name">From:</span><span class="header-value">{{from}}</span></div>
         <div><span class="header-name">To:</span><span class="header-value">{{to}}</span></div>
-        <div><span class="header-name">Date:</span><span class="header-value">{{date}}</span></div>
+        <div><span class="header-name">Date:</span><span class="header-value">{{formatDate date}}</span></div>
         <div><span class="header-name">Subject:</span><span class="header-value">{{subject}}</span></div>
       </div>
       <hr/>
       <div class="message-body">
         {{{nl2br body}}}
       </div>
+      {{#if has_attachments}}
+      <div class="attachments">
+        <h4>Message Attachments<h4>
+        <ul>
+        {{#each attachments}}
+          <li><a href="/api/messages/{{../id}}/attachments/{{index}}">{{pick filename "(no filename)"}}</a></li>
+        {{/each}}
+        </ul>
+      </div>
+      {{/if}}
     </script>
   </div>
 

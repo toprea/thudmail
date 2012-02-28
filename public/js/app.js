@@ -36,7 +36,7 @@ var thud = {
   init: function() {
 
     $.ajaxSetup({
-      headers: {'X-Thudmail-Authtoken': 'user1'}
+      headers: {'X-Thudmail-Authtoken': 'tudor'}
     });
 
     this.initTemplates();
@@ -116,6 +116,13 @@ var thud = {
     //god that's ugly.
     Handlebars.registerHelper('nl2br', function(text) {
       return (text + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br/>$2');
+    });
+    Handlebars.registerHelper('pick', function(text, defaultText) {
+      return (text || defaultText);
+    });
+    Handlebars.registerHelper('formatDate', function(millis) {
+      var d = new Date(millis);
+      return d.toDateString();
     });
   },
 

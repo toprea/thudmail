@@ -21,7 +21,7 @@ class Message < ActiveRecord::Base
 			:id => self.id,
 			:message_id => self.header_message_id,
 			:thread_id => self.thread_id,
-			:date => self.header_date,
+			:date => self.header_date.to_i * 1000, #date as unix timestamp
 			:from => self.header_from,
 			:to => self.header_to,
 			:subject => self.header_subject,
@@ -31,6 +31,7 @@ class Message < ActiveRecord::Base
 	end
 
 	def data_details
+		# everything from info view, plus more stuff
 		data = self.data_info
 
 		msg = self.parsed_message
@@ -45,8 +46,9 @@ class Message < ActiveRecord::Base
 
 					atts << {
 						:index => msg.attachments.index(a),
-						:content_id => a.content_id,
-						:content_type => a.content_type
+						:filename => Message.attachment_filename(a),
+						:content_type => Message.attachment_content_type(a),
+						:disposition => Message.attachment_disposition(a)
 					}
 				end
 				data[:attachments] = atts
@@ -220,5 +222,17 @@ class Message < ActiveRecord::Base
 			:body => self.body
 		}
 	end
+
+	def self.attachment_disposition(att)
+      return att['Content-Disposition'].value
+  end
+
+  def self.attachment_content_type(att)
+      return att['Content-Type'].value
+  end
+
+  def self.attachment_filename(att)
+      return att['Content-Disposition'].filename
+  end
 
 end
