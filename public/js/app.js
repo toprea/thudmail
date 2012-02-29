@@ -47,8 +47,9 @@ var thud = {
     if (localStorage['authToken']) {
 
       thud.setAuthToken(localStorage['authToken']);
-      // don't blow away an existing hash -- a user might refresh a page
 
+      thud.showStandardLayout();
+      
       this.router = new ThudRouter();
       Backbone.history.start();
       if (document.location.hash === "") {
@@ -103,7 +104,6 @@ var thud = {
   },
 
   showMailbox: function(label, page) {
-    thud.showStandardLayout();
     label = typeof label !== 'undefined' ? label : 'INBOX';
     page = typeof page !== 'undefined' ? page : '1';
 
@@ -129,6 +129,7 @@ var thud = {
         console.log('showMessage: got response');
         var el = $('#main');
         el.html(thud.renderTemplate('message-details', response));
+        $('a.attachment-link', el).on('click', thud.eventHandlers.downloadAttachment);
       }
     });
   },
@@ -191,11 +192,27 @@ var thud = {
           console.log("response from login: " + JSON.stringify(response));
           if (response['status'] === 'success') {
             thud.setAuthToken(response['authtoken']);
+            thud.showStandardLayout();
             thud.router.navigate("INBOX/p1", {trigger: true});
 
           } else {
             alert("invalid login.");
           }
+        }
+      });
+    },
+
+    downloadAttachment: function(e) {
+      e.preventDefault();
+      var messageId = $(this).attr('data-message-id');
+      var attachmentIndex = $(this).attr('data-attachment-index');
+      console.log("downloadAttachment: " + messageId + " " + attachmentIndex);
+      $.ajax({
+        url: '/api/download_token',
+        success: function(response) {
+          console.log("generated token " + JSON.stringify(response));
+          var downloadUrl = '/api/messages/' + messageId + '/attachments/' + attachmentIndex + '?token=' + response.token;
+          $('body').append('<iframe src="' + downloadUrl + '" style="display:none"></iframe>');
         }
       });
     }

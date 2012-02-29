@@ -108,7 +108,7 @@
         <h4>Message Attachments<h4>
         <ul>
         {{#each attachments}}
-          <li><a href="/api/messages/{{../id}}/attachments/{{index}}">{{pick filename "(no filename)"}}</a></li>
+          <li><a href="#" class="attachment-link" data-message-id="{{../id}}" data-attachment-index="{{index}}">{{pick filename "(no filename)"}}</a></li>
         {{/each}}
         </ul>
       </div>

@@ -2,7 +2,7 @@ class ApiController < ApplicationController
 
     # TODO the client currently links directly to attachments, so we can't
     # ensure that the auth token header is sent.  Fix this.
-    before_filter :validate_authtoken, :except => [:login, :attachment]
+    before_filter :validate_authtoken, :except => [:login]
 
     # pushState doesn't seem to work so well, but if we were to do it,
     # this action renders public.html
@@ -10,8 +10,22 @@ class ApiController < ApplicationController
     #    render :file => File.join(Rails.root, "public", "index.html"), :layout => false
     #end
 
+    def download_token
+        # TODO: generate a one-time-use user token instead
+        token = @current_user.username
+        response = {:token => token}
+        json response
+    end
+
     def validate_authtoken
         token = request.env['HTTP_X_THUDMAIL_AUTHTOKEN']
+        
+        # allow token to be passed in as query param 
+        # TODO: remove this once we've implemented generic user tokens
+        if not token 
+            token = params[:token]
+        end
+        
         if token
             user = User.validate_authtoken(token)
             if user
@@ -19,13 +33,8 @@ class ApiController < ApplicationController
                 return
             end
         end
-        unauthorized
-    end
-
-    def unauthorized
         render :nothing => true, :status => 403
     end
-
 
     def login
         user = User.authenticate(params[:username], params[:password])
