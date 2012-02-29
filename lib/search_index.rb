@@ -18,9 +18,12 @@ class SearchIndex
     @index << message.index_entry
   end
 
+  # returns an array of message IDs which match
   def search(query, options={})
     results = @index.search(query, options)
-    return results
+    message_ids = []
+    results.hits.each{|h| message_ids << @index[h.doc].load[:id]}
+    return message_ids
   end
 
   def reindex!

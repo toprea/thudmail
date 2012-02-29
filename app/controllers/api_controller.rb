@@ -1,6 +1,6 @@
 class ApiController < ApplicationController
 
-    # TODO we currently link to attachments directly in the client, so we can't
+    # TODO the client currently links directly to attachments, so we can't
     # ensure that the auth token header is sent.  Fix this.
     before_filter :validate_authtoken, :except => [:login, :attachment]
 
@@ -26,14 +26,6 @@ class ApiController < ApplicationController
         render :nothing => true, :status => 403
     end
 
-    def mark_read
-    end
-
-    def mark_unread
-    end
-
-    def delete
-    end
 
     def login
         user = User.authenticate(params[:username], params[:password])
@@ -52,13 +44,13 @@ class ApiController < ApplicationController
         page_size = 50
         page = (params[:page] || 1).to_i
         results = @current_user.index.search(query, :offset => (page_size * (page - 1)), :limit => page_size)
-        #        search_entries = results.hits.map{|h| {:score => h.score, :message_id => h.doc, :message => Message.find(h.doc).data_info} }
-        search_entries = results.hits.map{|h| Message.find(h.doc).data_info } 
-        response = {    :messages => search_entries, 
-            :count => results.hits.count, 
+        messages = results.map{|r| Message.find(r).data_info } 
+        response = {    :messages => messages, 
+            :count => results.length, 
             :page => page, 
             :per_page => page_size, 
-            :total => results.total_hits
+            #:total => results.total_hits  # encapsulate results in its own class that provides this
+            :total => "TODO: search totals"
         }
         json response
     end
