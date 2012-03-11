@@ -1,8 +1,9 @@
 Thudmail::Application.routes.draw do
 
   match '/api/login' => 'api#login', :via => :post
-  match '/api/messages/:id' => 'api#info', :via => :get
-  match '/api/messages/:id/details' => 'api#details', :via => :get
+  match '/api/messages/:id' => 'api#message_info', :via => :get
+  match '/api/messages/:id/details' => 'api#message_details', :via => :get
+  match '/api/messages/:id/raw' => 'api#message_raw'
   match '/api/download_token' => 'api#download_token', :via => :get
   match '/api/messages/:id/attachments/:index' => 'api#attachment', :via => :get
   match '/api/labels' => 'api#labels'

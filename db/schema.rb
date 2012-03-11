@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 6) do
+ActiveRecord::Schema.define(:version => 7) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "user_id",    :null => false
@@ -54,6 +54,12 @@ ActiveRecord::Schema.define(:version => 6) do
   add_index "messages", ["header_subject"], :name => "index_messages_on_header_subject"
   add_index "messages", ["id"], :name => "index_messages_on_id"
   add_index "messages", ["thread_id"], :name => "index_messages_on_thread_id"
+
+  create_table "tokens", :force => true do |t|
+    t.integer  "user_id", :null => false
+    t.string   "token",   :null => false
+    t.datetime "expires", :null => false
+  end
 
   create_table "users", :force => true do |t|
     t.string   "email"

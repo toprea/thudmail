@@ -17,7 +17,7 @@ class Message < ActiveRecord::Base
 	end		
 
 	def data_info
-		{
+		return {
 			:id => self.id,
 			:message_id => self.header_message_id,
 			:thread_id => self.thread_id,
@@ -61,7 +61,7 @@ class Message < ActiveRecord::Base
 	end
 
 	def parsed_message
-		Mail.new(self.raw_message)
+		return Mail.new(self.raw_message)
 	end
 
 	# Call Message.add to store a new message for a user and have it indexed
@@ -128,7 +128,8 @@ class Message < ActiveRecord::Base
 		# if one of those belongs to a non-singleton thread then so do we
 		# if not, try to find the last (most-recent) referenced message and add ourselves to its thread
 		# if that doesn't work either, do the same for In-Reply-To
-		# finally, strip all "Re:" prefixes and try to find the first matching subject line
+		# --finally, strip all "Re:" prefixes and try to find the first matching subject line--
+		# actually, subject-line matching isn't all that great, forget that.
 		# otherwise, we remain a singleton thread ourselves
 
 		# don't even bother unless subject starts with "Re:"
@@ -171,18 +172,20 @@ class Message < ActiveRecord::Base
 			end
 		end
 
-		if (not found_thread)
-			subject = self.header_subject.strip.downcase
-			while (subject.start_with?('re:'))
-				subject = subject[3,subject.length].strip
-			end
-			# TODO should use search index instead
-			subject_msgs = Message.where(:user_id => self.user.id, :header_subject => subject)
-			if subject_msgs.length > 0
-				found_thread = true
-				self.thread_id = subject_msgs.first.thread_id
-			end
-		end
+		# subject-line matching disabled
+		#
+		# if (not found_thread)
+		# 	subject = self.header_subject.strip.downcase
+		# 	while (subject.start_with?('re:'))
+		# 		subject = subject[3,subject.length].strip
+		# 	end
+		# 	# TODO should use search index instead
+		# 	subject_msgs = Message.where(:user_id => self.user.id, :header_subject => subject)
+		# 	if subject_msgs.length > 0
+		# 		found_thread = true
+		# 		self.thread_id = subject_msgs.first.thread_id
+		# 	end
+		# end
 
 		if found_thread
 			self.save
@@ -207,7 +210,7 @@ class Message < ActiveRecord::Base
 		FSMessageStore.get(self)
 	end
 
-	# Returns the document that will be indexed by Ferret for this message.
+	# Returns the hash that will be indexed by the search engine for this message.
 	def index_entry
 		return { :id => self.id, 
 			:message_id => self.header_message_id,

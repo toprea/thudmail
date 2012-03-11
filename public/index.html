@@ -29,6 +29,7 @@
         <span>thudmail</span>
         <input type="text" name="q" id="q"/>
         <button id="search">search</button>
+        <a href="#logout">logout</a>
       </div>    
       <div>
         <div id="sidebar" style="float:left; width: 200px; border: thin solid red;">
@@ -94,10 +95,11 @@
 
     <script name="message-details" type="text/html">
       <div class="message-header">
-        <div><span class="header-name">From:</span><span class="header-value">{{from}}</span></div>
-        <div><span class="header-name">To:</span><span class="header-value">{{to}}</span></div>
-        <div><span class="header-name">Date:</span><span class="header-value">{{formatDate date}}</span></div>
-        <div><span class="header-name">Subject:</span><span class="header-value">{{subject}}</span></div>
+        <div><span class="header-name">From: </span><span class="header-value">{{from}}</span></div>
+        <div><span class="header-name">To: </span><span class="header-value">{{to}}</span></div>
+        <div><span class="header-name">Date: </span><span class="header-value">{{formatDate date}}</span></div>
+        <div><span class="header-name">Subject: </span><span class="header-value">{{subject}}</span></div>
+        <div><a href="#" class="raw-link" data-message-id="{{id}}">download raw message</a></div>
       </div>
       <hr/>
       <div class="message-body">

@@ -6,9 +6,11 @@ $(document).ready(function () {
 var ThudRouter = Backbone.Router.extend({
   routes: {
     "login": "login",
+    "logout": "logout",
     "search/:query": "search",
     "search/:query/p:page": "search",
     "message/:id": "message",
+
     // these need to be last
     ":label": "label",
     ":label/p:page": "label"
@@ -18,6 +20,11 @@ var ThudRouter = Backbone.Router.extend({
   login: function() {
     console.log("route: login");
     thud.showLogin();
+  },
+
+  logout: function() {
+    console.log("route: logout");
+    thud.doLogout();
   },
 
   label: function(label, page) {
@@ -78,6 +85,12 @@ var thud = {
     $('#btn-login').on('click', thud.eventHandlers.login)
   },
 
+  doLogout: function() {
+    console.log("doLogout");
+    thud.setAuthToken('');
+    this.router.navigate("login", {trigger: true});
+  },
+
   showLabelList: function() {
     $.ajax({
       url: '/api/labels',
@@ -130,6 +143,7 @@ var thud = {
         var el = $('#main');
         el.html(thud.renderTemplate('message-details', response));
         $('a.attachment-link', el).on('click', thud.eventHandlers.downloadAttachment);
+        $('a.raw-link', el).on('click', thud.eventHandlers.downloadRawMessage);
       }
     });
   },
@@ -202,6 +216,10 @@ var thud = {
       });
     },
 
+    // to download an attachment, we need to first generate a download token
+    // by hitting /api/download_token (and sending the current user's auth token)
+    // then start the download by appending an iframe whose src is set to the
+    // attachment-download url and pass the download token in as a query parameter
     downloadAttachment: function(e) {
       e.preventDefault();
       var messageId = $(this).attr('data-message-id');
@@ -212,6 +230,21 @@ var thud = {
         success: function(response) {
           console.log("generated token " + JSON.stringify(response));
           var downloadUrl = '/api/messages/' + messageId + '/attachments/' + attachmentIndex + '?token=' + response.token;
+          $('body').append('<iframe src="' + downloadUrl + '" style="display:none"></iframe>');
+        }
+      });
+    },
+
+    // same deal as downloading an attachment
+    downloadRawMessage: function(e) {
+      e.preventDefault();
+      var messageId = $(this).attr('data-message-id');
+      console.log("downloadRawMessage: " + messageId);
+      $.ajax({
+        url: '/api/download_token',
+        success: function(response) {
+          console.log("generated token " + JSON.stringify(response));
+          var downloadUrl = '/api/messages/' + messageId + '/raw' + '?token=' + response.token;
           $('body').append('<iframe src="' + downloadUrl + '" style="display:none"></iframe>');
         }
       });

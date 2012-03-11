@@ -88,14 +88,19 @@ class ApiController < ApplicationController
         json response
     end
 
-    def info
+    def message_info
         msg = Message.where(:user_id => @current_user.id, :id => params[:id])[0]
         json msg.data_info
     end
 
-    def details
+    def message_details
         msg = Message.where(:user_id => @current_user.id, :id => params[:id])[0]
         json msg.data_details
+    end
+
+    def message_raw
+        msg = Message.where(:user_id => @current_user.id, :id => params[:id])[0]
+        send_data msg.raw_message, :type => 'text/plain', :filename => "#{msg.id}.eml"
     end
 
     def attachment
