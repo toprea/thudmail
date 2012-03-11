@@ -101,6 +101,7 @@ class ApiController < ApplicationController
         msg = Message.where(:user_id => @current_user.id, :id => params[:id])[0]
         if not (msg.labels.include? drafts_label)
             render :nothing => true, :status => 404
+            return
         end
         json msg.data_details 
     end
