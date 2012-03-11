@@ -16,6 +16,11 @@
   <!-- templates -->
   <div id='templates' style="display:none;">
 
+    <script name="test-view" type="text/html">
+      <h4>{{title}}</h4>
+      <button class="test-view-button">{{buttonTitle}}</button>
+    </script>
+
     <script name="login-form" type="text/html">
       <div>
         <div><label for="username">Username</label><input type="text" name="username" id="tb-username"></div>
@@ -38,6 +43,7 @@
           </div>
           <div id="label-list">
           </div>
+          <div id="test-view-container"></div>
         </div>
         <div id="main-container" style="float: left; width: 1400px; border: thin solid green;">
             <div id="main" style="width: 100%;"></div>

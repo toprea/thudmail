@@ -3,6 +3,26 @@ $(document).ready(function () {
   thud.init();
 });
 
+// base view class.  standard render method
+// gets the template via templateName, renders it with the model,
+// and inserts it into $el.
+var ThudView = Backbone.View.extend({
+  render: function() {
+    this.$el.html(thud.renderTemplate(this.templateName, this.model));
+  }
+})
+
+var TestView = ThudView.extend({
+  events: {
+    "click button.test-view-button": "testButtonClick"
+  },
+  templateName: 'test-view',
+  testButtonClick: function(e) {
+    alert(this.model.alertText);
+  }
+});
+
+
 var ThudRouter = Backbone.Router.extend({
   routes: {
     "login": "login",
@@ -81,6 +101,17 @@ var thud = {
     mainPage.html(thud.getTemplateSource('standard-layout'));
     $('#search').on('click', thud.eventHandlers.search);
     thud.showLabelList();
+
+    var testView = new TestView({
+      el: $('#test-view-container'),
+      model: {
+        title: "Test View",
+        buttonTitle: "click me",
+        alertText: "test view alert text"
+      }
+    });
+    testView.render();
+
   },
 
   showLogin: function() {
