@@ -100,6 +100,7 @@
         <div><span class="header-name">Date: </span><span class="header-value">{{formatDate date}}</span></div>
         <div><span class="header-name">Subject: </span><span class="header-value">{{subject}}</span></div>
         <div><a href="#" class="raw-link" data-message-id="{{id}}">download raw message</a></div>
+        <div><button id="reply" data-message-id="{{id}}">reply</button>
       </div>
       <hr/>
       <div class="message-body">
@@ -115,6 +116,27 @@
         </ul>
       </div>
       {{/if}}
+    </script>
+
+    <script name="compose-message" type="text/html">
+      <div class="message-header">
+        <div>
+          <span class="header-name">From: </span>
+          <input type="text" name="from" value="{{from}}" style="width: 75%;"/>
+        </div>
+        <div>
+          <span class="header-name">To: </span>
+          <input type="text" name="to" value="{{to}}" style="width: 75%;"/>
+        </div>
+        <div>
+          <span class="header-name">Subject: </span>
+          <input type="text" name="subject" value="{{subject}}" style="width: 75%;"/>
+        </div>
+      </div>
+      <hr/>
+      <div class="message-body">
+        <textarea style="width: 75%; height: 300px;">{{body}}</textarea>
+      </div>
     </script>
   </div>
 

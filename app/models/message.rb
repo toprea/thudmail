@@ -64,6 +64,21 @@ class Message < ActiveRecord::Base
 		return Mail.new(self.raw_message)
 	end
 
+	def add_reply
+		# use the built-in Message#reply method.
+		# if that method is given any params, will attempt to send the message, so don't do that
+
+		reply_mail = self.parsed_message.reply # returns a Mail::Message
+
+		#TODO: add quoting of original message
+		reply_mail.body = "REPLY BODY"
+
+		reply_label = Label.where(:user_id => self.user.id, :name => 'Drafts')[0]
+		
+		reply_msg = Message.add(reply_mail.to_s, self.user, self.account, reply_label)
+		return reply_msg
+	end
+
 	# Call Message.add to store a new message for a user and have it indexed
 	def self.add(raw_message, user, account, label, do_threading = true, do_indexing = true)
 		
@@ -118,6 +133,7 @@ class Message < ActiveRecord::Base
 			# fuck that's slow
 			user.index.add(message)
 		end
+		return message
 	end
 
 	def thread!

@@ -1,7 +1,5 @@
 class ApiController < ApplicationController
 
-    # TODO the client currently links directly to attachments, so we can't
-    # ensure that the auth token header is sent.  Fix this.
     before_filter :validate_authtoken, :except => [:login]
 
     # pushState doesn't seem to work so well, but if we were to do it,
@@ -98,9 +96,24 @@ class ApiController < ApplicationController
         json msg.data_details
     end
 
+    def draft_message_details
+        drafts_label = Label.where(:user_id => @current_user.id, :name => 'Drafts')[0]
+        msg = Message.where(:user_id => @current_user.id, :id => params[:id])[0]
+        if not (msg.labels.include? drafts_label)
+            render :nothing => true, :status => 404
+        end
+        json msg.data_details 
+    end
+
     def message_raw
         msg = Message.where(:user_id => @current_user.id, :id => params[:id])[0]
         send_data msg.raw_message, :type => 'text/plain', :filename => "#{msg.id}.eml"
+    end
+
+    def message_create_reply
+        msg = Message.where(:user_id => @current_user.id, :id => params[:id])[0]
+        msg_reply = msg.add_reply
+        json msg_reply.data_details
     end
 
     def attachment
@@ -115,7 +128,6 @@ class ApiController < ApplicationController
         
         send_data att.body.decoded, :type => content_type, :filename => filename#, :disposition => disposition
     end
-
     
 
     def json(data)

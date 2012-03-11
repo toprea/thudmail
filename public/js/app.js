@@ -10,7 +10,7 @@ var ThudRouter = Backbone.Router.extend({
     "search/:query": "search",
     "search/:query/p:page": "search",
     "message/:id": "message",
-
+    "compose/:id": "compose",
     // these need to be last
     ":label": "label",
     ":label/p:page": "label"
@@ -40,6 +40,11 @@ var ThudRouter = Backbone.Router.extend({
   message: function(id) {
     console.log("route: message");
     thud.showMessage(id);
+  },
+
+  compose: function(id) {
+    console.log("rote: compose");
+    thud.composeMessage(id);
   }
 });
 
@@ -137,13 +142,28 @@ var thud = {
 
   showMessage: function(id) {
     console.log("readMessage: " + id);
-    $.ajax({ url: '/api/messages/' + id + '/details',
+    $.ajax({ 
+      url: '/api/messages/' + id + '/details',
       success: function(response) {
         console.log('showMessage: got response');
         var el = $('#main');
         el.html(thud.renderTemplate('message-details', response));
         $('a.attachment-link', el).on('click', thud.eventHandlers.downloadAttachment);
         $('a.raw-link', el).on('click', thud.eventHandlers.downloadRawMessage);
+        $('#reply', el).on('click', thud.eventHandlers.reply);
+      }
+    });
+  },
+
+  composeMessage: function(id) {
+    console.log("composeMessage: " + id);
+    $.ajax({ 
+      url: '/api/drafts/' + id + '/details',
+      success: function(response) {
+        console.log('composeMessage: got response');
+        var el = $('#main');
+        el.html(thud.renderTemplate('compose-message', response));
+
       }
     });
   },
@@ -246,6 +266,20 @@ var thud = {
           console.log("generated token " + JSON.stringify(response));
           var downloadUrl = '/api/messages/' + messageId + '/raw' + '?token=' + response.token;
           $('body').append('<iframe src="' + downloadUrl + '" style="display:none"></iframe>');
+        }
+      });
+    },
+
+    reply: function(e) {
+      e.preventDefault();
+      var messageId = $(this).attr('data-message-id');
+      console.log("reply: " + messageId);
+      $.ajax({
+        url: '/api/messages/' + messageId + '/reply',
+        type: 'POST',
+        success: function(response) {
+          console.log("reply created: " + JSON.stringify(response));
+          thud.router.navigate("compose/" + response.id, {trigger: true});
         }
       });
     }
